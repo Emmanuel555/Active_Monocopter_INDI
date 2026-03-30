@@ -1,5 +1,6 @@
-# Installation instructions
-Flight Control Stack for Outdoor SAM
+# Flight Controls Stack for Outdoor SAM 
+
+Installation instructions
 
 **Teensy 4.1 w Udev rules:
 
