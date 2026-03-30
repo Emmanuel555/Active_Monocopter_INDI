@@ -1,5 +1,5 @@
-# ESP32 Setup for Outdoor SAM
-Installation instructions:
+# Installation instructions
+Flight Control Stack for Outdoor SAM
 
 **Teensy 4.1 w Udev rules:
 
