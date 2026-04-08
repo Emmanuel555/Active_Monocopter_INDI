@@ -18,3 +18,12 @@ void light_blink() {
   digitalWrite(LED_BUILTIN, LOW);
   delay(3000); // Wait for 3000 millisecond(s) or 3 second(s)
 }
+
+void light_blink_trigger(int trigger) {
+  if (trigger < 1100) {
+    digitalWrite(LED_BUILTIN, LOW);
+  } 
+  else {
+    digitalWrite(LED_BUILTIN, HIGH);
+  }
+}

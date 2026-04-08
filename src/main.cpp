@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "led_test.h"
-#include "wifi_rec.h"
+#include "motor_wifi_rec.h"
+
 
 // put function declarations here:
 int myFunction(int, int);
@@ -8,14 +9,12 @@ int myFunction(int, int);
 void setup() {
   // put your setup code here, to run once:
   int result = myFunction(2, 3);
-  est_led();
-  start_serial();
+  start_esc();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  light_blink();
-  wifi_recursion();
+  motor_wifi_recursion();
 }
       
 // put function definitions here:

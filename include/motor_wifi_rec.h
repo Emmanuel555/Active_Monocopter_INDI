@@ -2,3 +2,5 @@
 
 void start_serial();
 void wifi_recursion();
+void start_esc();
+void motor_wifi_recursion();
