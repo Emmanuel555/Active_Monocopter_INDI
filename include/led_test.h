@@ -3,3 +3,4 @@
 void est_led();
 void light_blink();
 void light_blink_trigger(int trigger);
+void light_dshot_blink_trigger();

@@ -9,6 +9,7 @@ Servo esc_motor;  // for PWM
 DShot esc_dshot(&Serial3, DShotType::DShot600); // for DShot
 const int MOTOR_PIN = 3; // change to your actual pin
 String msg = "";
+String state = "";
 
 void start_serial() {
   // put your setup code here, to run once:
@@ -45,14 +46,20 @@ void start_dshot_esc() {
   est_led();
 
   // run motor
-  // arm ESC for 2 seconds
+  // arm ESC for 3 seconds
   unsigned long start = millis(); // start time in milliseconds
-  while (millis() - start < 2000) {
+  while (millis() - start < 3000) {
       esc_dshot.sendThrottle(0, false);
       delayMicroseconds(500);
   }
 
-  Serial.println("ESC armed and ready");
+  // set default direction to normal - send 6 times as per spec
+    for (int i = 0; i < 6; i++) {
+        esc_dshot.sendCommand(20, false); // DSHOT_CMD_SPIN_DIRECTION_NORMAL
+        delayMicroseconds(500);
+    }
+
+  Serial.println("ESC DSHOT armed and ready");
 }
 
 void wifi_recursion() {
@@ -75,27 +82,35 @@ void wifi_recursion() {
   
 }
 
-void dshot_changeDirection(bool reverse, int throttle) {
+void dshot_changeDirection(int reverse, float throttle) {
     // stop motor first
-    unsigned long start = millis();
+    /* unsigned long start = millis();
     while (millis() - start < 500) {
         esc_dshot.sendThrottle(0, false);
         delayMicroseconds(500);
-    }
+    } */
 
     // set direction by sending appropriate throttle range
     // 1048 is stop/neutral
     // 1049-2047 is forward
     // 1-1047 is reverse
     // clamp based on direction
+
+    int dshot_throttle;
+
     if (reverse) {
-        throttle = throttle * 1047; // invert throttle for reverse
-        throttle = constrain(throttle, 1, 1047);    // reverse range
+        dshot_throttle = (int)(throttle * 1047); // invert throttle for reverse
+        dshot_throttle = constrain(dshot_throttle, 1, 1047);    // reverse range
+        Serial.printf("reverse_dshot_Throttle: %d\n", dshot_throttle);
     } 
     else {
-        throttle = (throttle * 998) + 1049; // forward throttle range
-        throttle = constrain(throttle, 1049, 2047); // forward range
+        dshot_throttle = (int)(throttle * 998) + 1049; // forward throttle range
+        dshot_throttle = constrain(dshot_throttle, 1049, 2047); // forward range
+        Serial.printf("dshot_Throttle: %d\n", dshot_throttle);
     }
+
+    // LED Trigger
+    light_dshot_blink_trigger();
 
     esc_dshot.sendThrottle(throttle, false);
     //Serial.printf("Direction %s, speed: %d\n", reverse ? "REVERSED" : "FORWARD", lastThrottle);
@@ -124,24 +139,55 @@ void dshot_motor_wifi_recursion() {
   while (true) {
       if (Serial7.available()) {
             String msg = Serial7.readStringUntil('\n');
-            msg.trim();
+            msg.trim(); // removes whitespace
+
+            for (int i = 0; i < msg.length(); i++) {
+                Serial.print((int)msg[i]); // print ASCII values
+                Serial.print(" ");
+            }
+            Serial.println();
             
             int commaIndex = msg.indexOf(',');
             if (commaIndex != -1) {
-                int direction = msg.substring(0, commaIndex).toInt();
-                int value = msg.substring(commaIndex + 1).toInt();
-
-                // LED Trigger
-                light_blink_trigger(value);
-
+                
+                String dirStr = msg.substring(0, commaIndex);
+                String valStr = msg.substring(commaIndex + 1);
+                
+                dirStr.trim();
+                valStr.trim();
+                
+                //Serial.println("dirStr: " + dirStr);
+                //Serial.println("valStr: " + valStr);
+                
+                int direction = dirStr.toInt();
+                float value = valStr.toFloat();
+                
+                //Serial.printf("direction: %d, value: %.2f\n", direction, value);
+                        
                 // keep sending throttle to keep motor running
                 dshot_changeDirection(direction, value); // direction: 1 for reverse, 0 for forward
                           
-                Serial7.printf("Direction: %d, Throttle: %d\n", direction, value);
+                Serial7.printf("Direction: %d, Throttle: %.2f\n", direction, value);
+                Serial.printf("Direction: %d, Throttle: %.2f\n", direction, value); 
+                
             }
         } 
-        delayMicroseconds(500);   
+        //delayMicroseconds(500);   
       }
 }  
 
-
+String optitrack_feedback() {
+    while (Serial7.available()) {
+        char c = Serial7.read();
+        if (c == '\n') {
+            String state_vector = state; // capture current state vector
+            state = "";
+            Serial.print("Received state vector: ");
+            Serial.println(state_vector);
+            return state_vector;
+        } else if (c != '\r') {
+            state += c;
+        }
+    }
+    return "NaN";
+}

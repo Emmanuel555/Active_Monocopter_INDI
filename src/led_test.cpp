@@ -27,3 +27,7 @@ void light_blink_trigger(int trigger) {
     digitalWrite(LED_BUILTIN, HIGH);
   }
 }
+
+void light_dshot_blink_trigger() {
+  digitalWrite(LED_BUILTIN, HIGH);  
+}
