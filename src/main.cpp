@@ -17,11 +17,11 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   motor_wifi_recursion();
-  optitrack_feedback();
-  /* if (micros() - lastDshotSend >= 1000) {
-    dshot_motor_wifi_recursion();
-    lastDshotSend = micros();
-  } */
+  //optitrack_feedback();
+  //if (micros() - lastDshotSend >= 1000) {
+  //dshot_motor_wifi_recursion();
+  //lastDshotSend = micros();
+  //} 
 }  
       
 // put function definitions here:

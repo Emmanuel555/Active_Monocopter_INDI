@@ -6,7 +6,7 @@
 
 
 Servo esc_motor;  // for PWM
-DShot esc_dshot(&Serial3, DShotType::DShot600); // for DShot
+DShot esc_dshot(&Serial3, DShotType::DShot600); // for DShot pin 14
 const int MOTOR_PIN = 3; // change to your actual pin
 String msg = "";
 String state = "";
@@ -41,23 +41,26 @@ void start_dshot_esc() {
   Serial.begin(115200);
   delay(500);
   Serial7.begin(115200);  // RX7, TX7
+  // manually init Serial3 to confirm
+  //Serial3.begin(115200);
+  //Serial.println("Serial3 initialized");
 
   //activate LED
   est_led();
 
   // run motor
-  // arm ESC for 3 seconds
+  // arm ESC for 2 seconds
   unsigned long start = millis(); // start time in milliseconds
-  while (millis() - start < 3000) {
+  while (millis() - start < 2000) {
       esc_dshot.sendThrottle(0, false);
       delayMicroseconds(500);
   }
 
   // set default direction to normal - send 6 times as per spec
-    for (int i = 0; i < 6; i++) {
-        esc_dshot.sendCommand(20, false); // DSHOT_CMD_SPIN_DIRECTION_NORMAL
-        delayMicroseconds(500);
-    }
+  //for (int i = 0; i < 6; i++) {
+  //    esc_dshot.sendCommand(20, false); // DSHOT_CMD_SPIN_DIRECTION_NORMAL
+  //    delayMicroseconds(500);
+  //}
 
   Serial.println("ESC DSHOT armed and ready");
 }
