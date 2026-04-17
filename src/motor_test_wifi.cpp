@@ -33,6 +33,8 @@ void start_esc() {
   esc_motor.attach(MOTOR_PIN); // motor GPIO PWM pin
   esc_motor.writeMicroseconds(1000); // send min signal to arm ESC
   delay(1200); // wait for ESC to arm
+
+  Serial.println("ESC PWM armed and ready");
 }
 
 void start_dshot_esc() {
@@ -125,8 +127,12 @@ void motor_wifi_recursion() {
     if (Serial7.available()) {
           int value = Serial7.parseInt();
           
+          Serial.println("connected to ESP32...");
+          
           // clamp to valid range
           value = constrain(value, 1000, 2000);
+
+          light_dshot_blink_trigger();
 
           // LED Trigger
           light_blink_trigger(value);
