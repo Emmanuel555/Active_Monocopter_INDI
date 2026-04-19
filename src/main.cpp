@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "led_test.h"
-#include "motor_wifi_rec.h"
+#include "motor_rec.h"
 
 
 // put function declarations here:
@@ -16,7 +16,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  motor_wifi_recursion();
+  motor_pwm_recursion();
   //optitrack_feedback();
   //if (micros() - lastDshotSend >= 1000) {
   //dshot_motor_wifi_recursion();

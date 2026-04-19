@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Servo.h>
 #include "led_test.h"
-#include "motor_wifi_rec.h"
+#include "motor_rec.h"
 #include <DShot.h>
 
 
@@ -32,7 +32,7 @@ void start_esc() {
   // run motor
   esc_motor.attach(MOTOR_PIN); // motor GPIO PWM pin
   esc_motor.writeMicroseconds(1000); // send min signal to arm ESC
-  delay(1200); // wait for ESC to arm
+  delay(1000); // wait for ESC to arm
 
   Serial.println("ESC PWM armed and ready");
 }
@@ -122,7 +122,7 @@ void dshot_changeDirection(int reverse, float throttle) {
     
 }
 
-void motor_wifi_recursion() {
+void motor_pwm_recursion() {
   while (true) {
     if (Serial7.available()) {
           int value = Serial7.parseInt();
@@ -132,15 +132,14 @@ void motor_wifi_recursion() {
           // clamp to valid range
           value = constrain(value, 1000, 2000);
 
-          light_dshot_blink_trigger();
+          //light_dshot_blink_trigger();
 
           // LED Trigger
           light_blink_trigger(value);
           
           esc_motor.writeMicroseconds(value);
-          Serial7.print("Motor set to: ");
-          Serial7.println(value);
-      }
+          //Serial7.printf("Motor set to: %d\n", value);
+          Serial.printf("Motor set to: %d\n", value);}
   }  
 }
 
