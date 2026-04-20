@@ -10,6 +10,8 @@ DShot esc_dshot(&Serial3, DShotType::DShot600); // for DShot pin 14
 const int MOTOR_PIN = 3; // change to your actual pin
 String msg = "";
 String state = "";
+int teensyCount = 0;
+unsigned long lastPrint = 0;
 
 void start_serial() {
   // put your setup code here, to run once:
@@ -25,6 +27,7 @@ void start_esc() {
   Serial.begin(115200);
   delay(500);
   Serial7.begin(115200);  // RX7, TX7
+  //Serial7.setTimeout(10); // add this
 
   //activate LED
   est_led();
@@ -125,23 +128,32 @@ void dshot_changeDirection(int reverse, float throttle) {
 void motor_pwm_recursion() {
   while (true) {
     if (Serial7.available()) {
-          int value = Serial7.parseInt();
-          
+          // flush old values, keep only latest
+          String msg;
           Serial.println("connected to ESP32...");
+          while (Serial7.available()) {
+              msg = Serial7.readStringUntil('\n');
+          }
+
+          teensyCount++;
+          // your existing code
           
-          // clamp to valid range
+          if (millis() - lastPrint >= 1000) {
+              Serial.printf("Teensy packets/sec: %d\n", teensyCount);
+              teensyCount = 0;
+              lastPrint = millis();
+          }
+
+          msg.trim();
+          int value = msg.toInt();
           value = constrain(value, 1000, 2000);
-
-          //light_dshot_blink_trigger();
-
-          // LED Trigger
-          light_blink_trigger(value);
           
+          light_blink_trigger(value);
           esc_motor.writeMicroseconds(value);
-          //Serial7.printf("Motor set to: %d\n", value);
-          Serial.printf("Motor set to: %d\n", value);}
-  }  
-}
+          Serial.printf("Motor set to: %d\n", value);
+    }  
+  }
+}  
 
 void dshot_motor_wifi_recursion() {
   while (true) {
