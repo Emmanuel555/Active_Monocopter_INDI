@@ -1,9 +1,0 @@
-#pragma once // this prevents multiple inclusions
-
-void start_serial();
-void wifi_recursion();
-void start_esc();
-void motor_pwm_recursion();
-void start_dshot_esc();
-void dshot_motor_wifi_recursion();
-String optitrack_feedback();
