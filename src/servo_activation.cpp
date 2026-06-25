@@ -70,12 +70,13 @@ void control_input_to_servos(float pwm[5]) {
     right_hinge.write(90);
     left_rotor.writeMicroseconds(1500);
     right_rotor.writeMicroseconds(1500);
-    return;
   }
-  left_hinge.write(constrain((int)pwm[0], 0, 180));
-  right_hinge.write(constrain((int)pwm[1], 0, 180));
-  left_rotor.writeMicroseconds(constrain((int)pwm[2], 900, 2100));
-  right_rotor.writeMicroseconds(constrain((int)pwm[3], 900, 2100));
+  else {
+    left_hinge.write(constrain((int)pwm[0], 0, 180));
+    right_hinge.write(constrain((int)pwm[0], 0, 180));
+    left_rotor.writeMicroseconds(constrain((int)pwm[2], 900, 2100));
+    right_rotor.writeMicroseconds(constrain((int)pwm[3], 900, 2100));
+  }
 }
 
 
