@@ -28,13 +28,18 @@ void start_servo_serial() {
 
 }
 
-// Non-blocking read of a framed packet from the ESP32: [0xAA sync][4 little-endian floats].
-// Call every loop() iteration. Returns true and fills pwm[4] once a full packet has arrived.
-bool read_pwm_serial1(float pwm[4]) {
+// Non-blocking read of a framed packet from the ESP32: [0xAA sync][5 little-endian floats].
+// pwm[4] is the stop flag: nonzero forces all servos/rotors to their neutral/safe position.
+// Drains the entire Serial1 buffer on every call so that if multiple packets have queued up
+// (e.g. the sender outpaces loop()), only the newest one is kept and stale ones are discarded.
+// Call every loop() iteration. Returns true and fills pwm[5] once a full packet has arrived.
+bool read_pwm_serial1(float pwm[5]) {
   static const uint8_t SYNC_BYTE = 0xAA;
   static bool in_packet = false;
-  static uint8_t buf[4 * sizeof(float)];
+  static uint8_t buf[5 * sizeof(float)];
   static uint8_t idx = 0;
+
+  bool got_packet = false;
 
   while (Serial1.available()) {
     uint8_t b = Serial1.read();
@@ -51,14 +56,22 @@ bool read_pwm_serial1(float pwm[4]) {
     if (idx == sizeof(buf)) {
       memcpy(pwm, buf, sizeof(buf));
       in_packet = false;
-      return true;
+      got_packet = true;
     }
   }
-  return false;
+  return got_packet;
 }
 
 // pwm[0]=left_hinge, pwm[1]=right_hinge (degrees, 0-180); pwm[2]=left_rotor, pwm[3]=right_rotor (us, 900-2100).
-void control_input_to_servos(float pwm[4]) {
+// pwm[4]=stop flag: nonzero forces hinges to 90 deg and rotors to 1500us, ignoring pwm[0..3].
+void control_input_to_servos(float pwm[5]) {
+  if (pwm[4] != 0.0f) {
+    left_hinge.write(90);
+    right_hinge.write(90);
+    left_rotor.writeMicroseconds(1500);
+    right_rotor.writeMicroseconds(1500);
+    return;
+  }
   left_hinge.write(constrain((int)pwm[0], 0, 180));
   right_hinge.write(constrain((int)pwm[1], 0, 180));
   left_rotor.writeMicroseconds(constrain((int)pwm[2], 900, 2100));

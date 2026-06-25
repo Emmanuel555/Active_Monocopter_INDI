@@ -10,10 +10,10 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  float pwm[4];
+  float pwm[5];
   if (read_pwm_serial1(pwm)) {
     control_input_to_servos(pwm);
-    Serial.printf("left hinge, right hinge, left rotor, right rotor: %f, %f, %f, %f\n", pwm[0], pwm[1], pwm[2], pwm[3]);
+    Serial.printf("left hinge, right hinge, left rotor, right rotor, go/stop: %f, %f, %f, %f, %f\n", pwm[0], pwm[1], pwm[2], pwm[3], pwm[4]);
     light_dshot_blink_trigger();
   }
 }  
