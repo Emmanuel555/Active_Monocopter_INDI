@@ -65,13 +65,13 @@ bool read_pwm_serial1(float pwm[5]) {
 // pwm[0]=left_hinge, pwm[1]=right_hinge (degrees, 0-180); pwm[2]=left_rotor, pwm[3]=right_rotor (us, 900-2100).
 // pwm[4]=stop flag: nonzero forces hinges to 90 deg and rotors to 1500us, ignoring pwm[0..3].
 void control_input_to_servos(float pwm[5]) {
-  if (pwm[4] != 0.0f) {
+  /* if (pwm[4] != 0.0f) {
     left_hinge.write(90);
     right_hinge.write(90);
     left_rotor.writeMicroseconds(1500);
     right_rotor.writeMicroseconds(1500);
     return;
-  }
+  } */
   left_hinge.write(constrain((int)pwm[0], 0, 180));
   right_hinge.write(constrain((int)pwm[1], 0, 180));
   left_rotor.writeMicroseconds(constrain((int)pwm[2], 900, 2100));
